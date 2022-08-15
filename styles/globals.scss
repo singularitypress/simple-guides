@@ -2,10 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@import "./inter";
-
-@import "./components/hero";
-
 html {
   @apply bg-isabelline;
   @apply text-eerie-black;
@@ -14,9 +10,9 @@ html {
     @apply text-isabelline;
   }
 
-  font-family: "Inter";
+  font-family: "Inter", sans-serif;
   @supports (font-variation-settings: normal) {
-    font-family: "Inter var";
+    font-family: "Inter var", sans-serif;
   }
 }
 

@@ -1,5 +1,5 @@
 import { config } from "@keystone-6/core";
-import { Post, User, Hero } from "./cms/lists";
+import * as lists from "./cms/lists";
 import { withAuth, session } from "./cms/auth";
 
 export default config(
@@ -15,10 +15,10 @@ export default config(
       generateNextGraphqlAPI: true,
       generateNodeAPI: true,
     },
-    lists: { Post, User, Hero },
+    lists,
     session,
     ui: {
-      isAccessAllowed: (context) => !!context.session?.data,
+      isAccessAllowed: (context: any) => !!context.session?.data,
     },
   }),
 );

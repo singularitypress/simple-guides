@@ -2,22 +2,19 @@ import { GetStaticPathsResult, GetStaticPropsContext } from "next";
 import Link from "next/link";
 
 import { query } from ".keystone/api";
-import { DocumentRenderer } from "@keystone-6/document-renderer";
 import Head from "next/head";
 
-type Post = {
+type Game = {
   id: string;
   title: string;
-  content: {
-    document: any;
-  };
+  description: string;
 };
 
-export default ({ post }: { post: Post }) => {
+export default ({ game }: { game: Game }) => {
   return (
     <>
       <Head>
-        <title>{post.title}</title>
+        <title>{game.title}</title>
       </Head>
       <main style={{ margin: "3rem" }}>
         <div>
@@ -25,21 +22,21 @@ export default ({ post }: { post: Post }) => {
             <a>&larr; back home</a>
           </Link>
         </div>
-        <h1>{post.title}</h1>
-        <DocumentRenderer document={post.content.document} />
+        <h1>{game.title}</h1>
+        <p>{game.description}</p>
       </main>
     </>
   );
 };
 
 export const getStaticPaths = async (): Promise<GetStaticPathsResult> => {
-  const posts = (await query.Post.findMany({
+  const games = (await query.Game.findMany({
     query: `slug`,
   })) as { slug: string }[];
 
-  const paths = posts
+  const paths = games
     .filter(({ slug }) => !!slug)
-    .map(({ slug }) => `/updates/${slug}`);
+    .map(({ slug }) => `/game/${slug}`);
 
   return {
     paths,
@@ -48,12 +45,12 @@ export const getStaticPaths = async (): Promise<GetStaticPathsResult> => {
 };
 
 export const getStaticProps = async ({ params }: GetStaticPropsContext) => {
-  const post = (await query.Post.findOne({
+  const game = (await query.Game.findOne({
     where: { slug: params!.slug as string },
-    query: "id title content { document }",
-  })) as Post | null;
-  if (!post) {
+    query: "id title description",
+  })) as Game | null;
+  if (!game) {
     return { notFound: true };
   }
-  return { props: { post } };
+  return { props: { game } };
 };
