@@ -3,12 +3,14 @@ import Link from "next/link";
 
 import { query } from ".keystone/api";
 import Head from "next/head";
-import { getGame } from "lib";
+import { readFileSync } from "fs";
+import { join } from "path";
 
 type Game = {
   id: string;
   title: string;
   description: string;
+  markdown: string;
 };
 
 export default ({ game }: { game: Game }) => {
@@ -25,6 +27,9 @@ export default ({ game }: { game: Game }) => {
         </div>
         <h1>{game.title}</h1>
         <p>{game.description}</p>
+        <pre>
+          <code>{game.markdown}</code>
+        </pre>
       </main>
     </>
   );
@@ -37,7 +42,7 @@ export const getStaticPaths = async (): Promise<GetStaticPathsResult> => {
 
   const paths = games
     .filter(({ slug }) => !!slug)
-    .map(({ slug }) => `/game/${slug}`);
+    .map(({ slug }) => `/guide/${slug}`);
 
   return {
     paths,
@@ -46,12 +51,21 @@ export const getStaticPaths = async (): Promise<GetStaticPathsResult> => {
 };
 
 export const getStaticProps = async ({ params }: GetStaticPropsContext) => {
+  const game = (await query.Game.findOne({
+    where: { slug: params!.slug as string },
+    query: "title markdown genres { title } platforms { title }",
+  })) as Game | null;
+  if (!game) {
+    return { notFound: true };
+  }
   return {
     props: {
-      game: await getGame(
-        (params?.slug as string) ?? "",
-        "title description hero logo genres { title } platforms { title }",
-      ),
+      game: {
+        ...game,
+        markdown: readFileSync(join(process.cwd(), "public", game.markdown), {
+          encoding: "utf-8",
+        }),
+      },
     },
   };
 };

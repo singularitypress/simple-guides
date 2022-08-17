@@ -25,8 +25,10 @@ export default ({ games }: InferGetStaticPropsType<typeof getStaticProps>) => {
             {/* Render each post with a link to the content page */}
             {games.map((game) => (
               <li key={game.id}>
-                <Link href={`/game/${game.slug}`}>
-                  <a>{game.title}</a>
+                <strong>{game.title}</strong>
+                <br />
+                <Link href={`/guide/${game.slug}`}>
+                  <a>Guide</a>
                 </Link>
               </li>
             ))}
